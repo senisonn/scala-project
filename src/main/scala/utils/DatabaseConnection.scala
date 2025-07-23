@@ -4,25 +4,25 @@ import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet}
 import scala.util.{Try, Using}
 
 object DatabaseConnection {
-  private val url = "jdbc:postgresql://postgres_db:5432/scala_db"
-  private val username = "scala_user"
-  private val password = "scala_pass"
-  
+  private val url = "jdbc:postgresql://localhost:5432/ridesharing"
+  private val username = "kevincarttigueane"
+  private val password = ""
+
   def getConnection: Connection = {
     Class.forName("org.postgresql.Driver")
     DriverManager.getConnection(url, username, password)
   }
-  
+
   def withConnection[T](operation: Connection => T): Try[T] = {
     Using(getConnection)(operation)
   }
-  
+
   def withPreparedStatement[T](sql: String)(operation: PreparedStatement => T): Try[T] = {
     withConnection { conn =>
       Using(conn.prepareStatement(sql))(operation).get
     }
   }
-  
+
   def executeQuery[T](sql: String, params: Any*)(resultProcessor: ResultSet => T): Try[T] = {
     withConnection { conn =>
       Using(conn.prepareStatement(sql)) { stmt =>
@@ -33,7 +33,7 @@ object DatabaseConnection {
       }.get
     }
   }
-  
+
   def executeUpdate(sql: String, params: Any*): Try[Int] = {
     withConnection { conn =>
       Using(conn.prepareStatement(sql)) { stmt =>
@@ -44,7 +44,7 @@ object DatabaseConnection {
       }.get
     }
   }
-  
+
   def executeInsertAndGetId(sql: String, params: Any*): Try[Int] = {
     withConnection { conn =>
       Using(conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) { stmt =>
@@ -59,7 +59,7 @@ object DatabaseConnection {
       }.get
     }
   }
-  
+
   private def setParameter(stmt: PreparedStatement, index: Int, param: Any): Unit = {
     param match {
       case null => stmt.setNull(index, java.sql.Types.NULL)
@@ -69,8 +69,7 @@ object DatabaseConnection {
       case d: Double => stmt.setDouble(index, d)
       case f: Float => stmt.setFloat(index, f)
       case b: Boolean => stmt.setBoolean(index, b)
-      case bd: scala.math.BigDecimal => stmt.setBigDecimal(index, bd.bigDecimal)
-      case jbd: java.math.BigDecimal => stmt.setBigDecimal(index, jbd)
+      case bd: BigDecimal => stmt.setBigDecimal(index, bd.bigDecimal)
       case date: java.time.LocalDate => stmt.setDate(index, java.sql.Date.valueOf(date))
       case time: java.time.LocalTime => stmt.setTime(index, java.sql.Time.valueOf(time))
       case datetime: java.time.LocalDateTime => stmt.setTimestamp(index, java.sql.Timestamp.valueOf(datetime))
@@ -81,7 +80,7 @@ object DatabaseConnection {
       case _ => stmt.setString(index, param.toString)
     }
   }
-  
+
   def testConnection(): Boolean = {
     Try {
       Using(getConnection) { conn =>

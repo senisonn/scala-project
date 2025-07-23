@@ -7,7 +7,6 @@ import java.sql.ResultSet
 import java.time.LocalDate
 
 class UserDAO {
-  
   def create(user: User): Try[User] = {
     val sql = """
       INSERT INTO users (email, password_hash, first_name, last_name, phone, date_of_birth, is_driver, driver_license)
