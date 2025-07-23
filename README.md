@@ -35,7 +35,7 @@ ridesharing-platform/
 
 ### Technical Stack
 - **Language**: Scala 3.3.6
-- **Database**: PostgreSQL 12+
+- **Database**: PostgreSQL 16+
 - **Connectivity**: JDBC with prepared statements
 - **Security**: BCrypt password hashing
 - **Build Tool**: SBT
@@ -46,13 +46,23 @@ ridesharing-platform/
 
 The easiest way to run the application with all dependencies:
 
-```bash
-# Quick start with Docker
-./docker-start.sh
+⚠️ Important – Using docker attach
 
-# Or manually with docker-compose
+When you start the application with:
+```bash
 docker-compose up --build
 ```
+The initial terminal interaction (e.g., a menu or prompt with choices) is only displayed in the terminal where docker-compose was launched.
+
+If you then attach to the container using:
+```bash
+docker attach scala_project
+```
+
+You won’t see the initial options, because they were already displayed in the first terminal.
+However, once the first input is entered in the docker-compose terminal, the interaction will resume normally in the attached terminal.
+
+✅ Tip: Make the initial selection from the docker-compose terminal, then use docker attach if needed to continue interacting.
 
 For detailed Docker instructions, see [README-DOCKER.md](README-DOCKER.md).
 
