@@ -1,0 +1,36 @@
+services:
+  scala-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scala_project
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: scala_db
+      POSTGRES_USER: scala_user
+      POSTGRES_PASSWORD: scala_pass
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    command: sbt run
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: scala_db
+      POSTGRES_USER: scala_user
+      POSTGRES_PASSWORD: scala_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:
