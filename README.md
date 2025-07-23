@@ -33,6 +33,41 @@ ridesharing-platform/
 └── README.md
 ```
 
+### Architecture Analysis
+
+#### 1. Global Backend Architecture
+
+* **Layered Architecture**: Clear separation of responsibilities (Presentation, Service, Data Access, Models).
+* **`RidesharingApp.scala`**: Entry point and presentation layer (command-line interface).
+* **`models/`**: Defines data structure (entities) using `case class`.
+* **`dao/`**: Data Access Object (DAO) layer for CRUD operations with the database.
+* **`services/`**: Contains the application's business logic.
+* **`utils/`**: Provides cross-cutting functionalities like database connection management.
+
+#### 2. DAO Structure (Example: `UserDAO`)
+
+* **Single Responsibility**: Each DAO manages a single entity (e.g., `UserDAO` for users).
+* **CRUD Operations**: Provides standardized methods (`create`, `findById`, `update`, `delete`).
+* **Robust Error Handling**: Uses `Try` to encapsulate operations that can fail.
+* **Connection Abstraction**: Centralizes connection management through a utility (`DatabaseConnection`).
+* **Data-Object Mapping**: A dedicated method (`mapResultSetToUser`) converts SQL results to Scala objects.
+
+#### 3. Model Structure (Example: `User`)
+
+* **`case class`**: Used to create immutable and concise data models.
+* **Direct Mapping**: Fields correspond to database table columns.
+* **Null Safety**: `Option[T]` is used to handle fields that can be null.
+* **Built-in Validation**: `require` is used to ensure data integrity when creating objects.
+* **Utility Methods**: Can include methods for derived calculations or formatting (e.g., `fullName`).
+
+#### 4. Authentication Service (`AuthService`)
+
+* **Business Logic**: Encapsulates complex processes like registration or password changes.
+* **Security**: Handles password hashing (`BCrypt`) and verification.
+* **Input Validation**: Validates data (email format, password complexity) before processing.
+* **Orchestration**: Coordinates calls to one or more DAOs to execute functionality.
+* **Dependency Injection**: Receives necessary DAOs through its constructor, promoting decoupling.
+
 ### Technical Stack
 - **Language**: Scala 3.3.6
 - **Database**: PostgreSQL 16+
